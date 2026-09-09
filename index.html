@@ -1,0 +1,624 @@
+<!doctype html>
+<!--
+  Mykonos blue tumbler — single-product page. Plain HTML/CSS/JS, no build step.
+
+  ASSUMPTIONS (chosen as the most standard option rather than pausing to ask):
+  1. Design system: "Mykonos Blue Tumbler", implemented token-for-token in
+     assets/design-system/tokens.css. Light is the default mode; dark is
+     available by system preference and by the header toggle. Earlier APEX
+     tokens have been removed entirely — nothing on this page derives from them.
+  2. TODO: color-mykonos-blue (#44607A) is the working approximation of
+     Pantone 18-4434. Sample the final render and update that one token; every
+     blue here follows it.
+  3. Model: the supplied 350 ml tumbler GLB (5 named parts, one PBR atlas, one
+     "Explode_and_Return" clip) at assets/model/tumbler.glb. The GLB's baked
+     texture is the navy original, so the on-page finish will not read as
+     Mykonos blue until the model is re-textured. TODO: re-bake the base colour
+     from the final product render.
+  4. Standalone site: index.html sits at the repo root, everything else is
+     referenced by relative path, so any static host serves it as-is.
+  5. Photography does not exist yet. Every <img> is a locally generated SVG in
+     assets/img/ stamped "Placeholder". TODO: replace before launch.
+  6. Price ($34), the $45 free-shipping threshold and the 4.8 / 2,300 review
+     figures are placeholder commerce copy. TODO: wire to real catalogue and
+     reviews. Dimensions and capacity come from assets/model/validation.json
+     and are stated as estimates, matching that model's own README.
+  7. Cart is front-end only. TODO: point at the real cart endpoint.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mykonos blue tumbler — 350 ml, matte steel, straw lid</title>
+<meta name="description" content="A 350 ml matte stainless steel tumbler in Mykonos blue. Holds temperature through a full working day, fits a car cup holder, and takes apart for the dishwasher.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F6F3EE'/%3E%3Crect x='11' y='8' width='10' height='18' rx='2' fill='%2344607A'/%3E%3Crect x='15' y='3' width='2' height='8' fill='%23B98A4E'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f%5B%5D=general-sans@400,500,600&display=swap">
+<link rel="stylesheet" href="assets/design-system/tokens.css">
+<link rel="stylesheet" href="style.css">
+<!-- Sets data-theme before first paint so a chosen mode never flashes. -->
+<script>
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+</head>
+<body>
+
+<!-- Thin-line icon set, 1.5px stroke, rounded caps — echoes the tumbler's
+     rounded silhouette. Referenced with <use>, so each path exists once. -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute" focusable="false">
+  <defs>
+    <g id="i-sun" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"></path>
+    </g>
+    <g id="i-moon" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 14.5A8 8 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"></path>
+    </g>
+    <g id="i-check" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 12.5l5 5L20 6.5"></path>
+    </g>
+    <g id="i-clock" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path>
+    </g>
+    <g id="i-steel" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse cx="12" cy="6" rx="6" ry="2.5"></ellipse>
+      <path d="M6 6v12c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V6"></path>
+    </g>
+    <g id="i-drop" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3.5c3 3.6 5.5 6.6 5.5 9.6a5.5 5.5 0 1 1-11 0c0-3 2.5-6 5.5-9.6z"></path>
+    </g>
+    <g id="i-waves" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9c2.5-2 4.5-2 7 0s4.5 2 7 0M3 15c2.5-2 4.5-2 7 0s4.5 2 7 0"></path>
+    </g>
+    <g id="i-shield" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3.5l7 2.5v6c0 4-3 7-7 8.5-4-1.5-7-4.5-7-8.5V6z"></path>
+    </g>
+    <g id="i-return" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 9h11a4.5 4.5 0 0 1 0 9H9"></path><path d="M7.5 5.5L4 9l3.5 3.5"></path>
+    </g>
+    <g id="i-truck" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6.5h10v10H3zM13 10h4l3 3v3.5h-7"></path>
+      <circle cx="7" cy="18" r="1.6"></circle><circle cx="16.5" cy="18" r="1.6"></circle>
+    </g>
+  </defs>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container site-header__row">
+    <span class="wordmark">Coded</span>
+    <nav class="site-nav" aria-label="Sections">
+      <a href="#features">Features</a>
+      <a href="#demo">The parts</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#faq">Questions</a>
+    </nav>
+    <div class="site-header__actions">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode">
+        <svg class="icon icon--sun" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sun"></use></svg>
+        <svg class="icon icon--moon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-moon"></use></svg>
+      </button>
+      <button class="btn btn--outline btn--sm" data-add-to-cart>Add to cart</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ========================= 1. Hero ========================= -->
+  <section class="hero">
+    <div class="container hero__grid">
+
+      <div class="hero__stage">
+        <div class="stage" id="stage-hero">
+          <model-viewer
+            class="stage__model"
+            id="mv"
+            src="assets/model/tumbler.glb"
+            alt="A 350 ml matte steel tumbler with a straw lid, turning slowly. Drag to inspect it from any angle."
+            camera-controls
+            touch-action="pan-y"
+            interaction-prompt="none"
+            camera-orbit="-28deg 78deg 0.70m"
+            camera-target="0m 0.105m 0m"
+            min-camera-orbit="auto auto 0.34m"
+            max-camera-orbit="auto auto 1.2m"
+            field-of-view="27deg"
+            shadow-intensity="1"
+            shadow-softness="0.85"
+            exposure="1"
+            environment-image="neutral">
+
+            <button class="hotspot" slot="hotspot-lid" data-part="Lid"
+                    data-position="0.008m 0.1735m 0.004m" data-normal="0 1 0"
+                    data-label="Leak-resistant straw lid"
+                    data-note="A threaded lid with a gasketed straw grommet — it stays shut in a bag.">
+              <span class="hotspot__dot" aria-hidden="true"></span>
+              <span class="hotspot__label">Straw lid</span>
+            </button>
+
+            <button class="hotspot" slot="hotspot-body" data-part="Body"
+                    data-position="0.0315m 0.095m 0.006m" data-normal="1 0 0"
+                    data-label="Double-wall vacuum body"
+                    data-note="Matte-coated insulated steel. 350 ml below the lid roof.">
+              <span class="hotspot__dot" aria-hidden="true"></span>
+              <span class="hotspot__label">Body</span>
+            </button>
+
+            <button class="hotspot" slot="hotspot-base" data-part="Base pad"
+                    data-position="0.018m 0.004m 0.026m" data-normal="0 0 1"
+                    data-label="63 mm cup-holder base"
+                    data-note="A non-slip pad on a 62.9 mm footprint — it drops into a standard car cup holder.">
+              <span class="hotspot__dot" aria-hidden="true"></span>
+              <span class="hotspot__label">Base</span>
+            </button>
+          </model-viewer>
+
+          <p class="stage__loading">Loading the 3D model…</p>
+          <p class="stage__hint" id="stage-hint">Drag to turn it · tap a marker</p>
+        </div>
+        <p class="stage__caption">Interactive 3D model, estimated reconstruction: 62.9 mm across, 170 mm with the lid, 215 mm with the straw.</p>
+      </div>
+
+      <div class="hero__copy">
+        <p class="label">350 ml · matte stainless steel · straw lid</p>
+        <h1 class="display-1 hero__title">Still cold at six.</h1>
+        <p class="lede hero__lede">Made for people who live at a desk and in a car. Ice at nine
+          is still ice after the last meeting, the straw lid doesn't weep into a bag, and the
+          63 mm base drops straight into a cup holder.</p>
+
+        <div class="price-row">
+          <span class="price">$34</span>
+          <span class="price__unit">for the 350 ml tumbler</span>
+        </div>
+        <p class="give">
+          <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"></use></svg>
+          Free shipping over $45, and a spare straw with your first order.
+        </p>
+
+        <div class="cluster" style="margin-top: var(--space-4)">
+          <button class="btn btn--primary btn--lg" data-add-to-cart data-hero-cta>Add to cart, $34</button>
+          <a class="btn btn--outline btn--lg" href="#demo">See how it opens</a>
+        </div>
+
+        <p class="proof-row">
+          <span class="stars" role="img" aria-label="Rated 4.8 out of 5">★★★★★</span>
+          <strong data-countup="4.8" data-decimals="1">4.8</strong>
+          <span class="dot-sep">·</span>
+          <span><strong data-countup="2300" data-suffix="+">2,300+</strong> reviews</span>
+        </p>
+        <p class="scarcity">
+          <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"></use></svg>
+          Made in small runs. Orders ship Monday to Friday from Kuwait City; anything placed
+          after 2 pm Thursday goes out on Monday.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Trust row, below the fold ==================== -->
+  <section class="trust" aria-label="Materials and guarantees">
+    <div class="container trust__row">
+      <span class="trust__item"><svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-steel"></use></svg>18/8 food-grade steel</span>
+      <span class="trust__item"><svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-drop"></use></svg>BPA-free lid and straw</span>
+      <span class="trust__item"><svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-waves"></use></svg>Dishwasher-safe parts</span>
+      <span class="trust__item"><svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"></use></svg>Two-year seal warranty</span>
+      <span class="trust__item"><svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-return"></use></svg>30-day returns</span>
+    </div>
+  </section>
+
+  <!-- ==================== 2. Key features ==================== -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section__head">
+        <h2>Four things it does well</h2>
+      </div>
+      <ul class="features" role="list">
+        <li class="feature">
+          <span class="feature__figure">12h</span>
+          <h3>Cold through the day</h3>
+          <p>A double-wall vacuum body. Ice survives a full shift in a warm car.</p>
+        </li>
+        <li class="feature">
+          <span class="feature__figure">0</span>
+          <h3>Drips in your bag</h3>
+          <p>A threaded lid and a gasketed straw grommet instead of a friction push-fit.</p>
+        </li>
+        <li class="feature">
+          <span class="feature__figure">63</span>
+          <h3>Millimetre footprint</h3>
+          <p>Measured at 62.9 mm across the base — no wobble, no adapter ring.</p>
+        </li>
+        <li class="feature">
+          <span class="feature__figure">5</span>
+          <h3>Parts, all washable</h3>
+          <p>Body, lid, straw, grommet and base pad separate for the top rack.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= 3. Interactive product demo ================= -->
+  <section class="section section--surface" id="demo">
+    <div class="container demo__grid">
+      <div>
+        <div class="section__head">
+          <p class="label">Interactive demo</p>
+          <h2>Take it apart without holding it</h2>
+          <p class="lede lede--sm">The view has tilted to the straw opening. Play the exploded
+            view to see all five parts, or turn the model and tap a marker.</p>
+        </div>
+
+        <div class="cluster cluster--tight demo__controls">
+          <button class="btn btn--outline" id="btn-explode">Play exploded view</button>
+          <button class="btn btn--ghost" id="btn-reset">Reset the view</button>
+        </div>
+
+        <dl class="parts" id="parts">
+          <div class="parts__row"><dt>Body</dt><dd>Insulated wall, closed interior, rounded base</dd></div>
+          <div class="parts__row"><dt>Lid</dt><dd>Helical thread, hollow, central straw hole</dd></div>
+          <div class="parts__row"><dt>Straw grommet</dt><dd>Soft seal around the straw</dd></div>
+          <div class="parts__row"><dt>Straw</dt><dd>204 mm tube, 7.4 mm outer diameter</dd></div>
+          <div class="parts__row"><dt>Base pad</dt><dd>Non-slip, keeps it quiet on a desk</dd></div>
+        </dl>
+      </div>
+
+      <div class="demo__stage">
+        <div class="stage stage--square" id="stage-demo">
+          <model-viewer
+            class="stage__model"
+            id="mv2"
+            src="assets/model/tumbler.glb"
+            alt="The same tumbler, tilted to show the straw opening in the lid. Drag to turn it, or play the exploded view to separate the five parts."
+            camera-controls
+            touch-action="pan-y"
+            interaction-prompt="none"
+            camera-orbit="18deg 52deg 0.42m"
+            camera-target="0m 0.150m 0m"
+            min-camera-orbit="auto auto 0.30m"
+            max-camera-orbit="auto auto 1.2m"
+            field-of-view="26deg"
+            shadow-intensity="1"
+            shadow-softness="0.85"
+            exposure="1"
+            environment-image="neutral">
+
+            <button class="hotspot" slot="hotspot-lid" data-part="Lid"
+                    data-position="0.008m 0.1735m 0.004m" data-normal="0 1 0"
+                    data-label="Leak-resistant straw lid"
+                    data-note="A threaded lid with a gasketed straw grommet — it stays shut in a bag.">
+              <span class="hotspot__dot" aria-hidden="true"></span>
+              <span class="hotspot__label">Straw lid</span>
+            </button>
+
+            <button class="hotspot" slot="hotspot-body" data-part="Body"
+                    data-position="0.0315m 0.095m 0.006m" data-normal="1 0 0"
+                    data-label="Double-wall vacuum body"
+                    data-note="Matte-coated insulated steel. 350 ml below the lid roof.">
+              <span class="hotspot__dot" aria-hidden="true"></span>
+              <span class="hotspot__label">Body</span>
+            </button>
+
+            <button class="hotspot" slot="hotspot-base" data-part="Base pad"
+                    data-position="0.018m 0.004m 0.026m" data-normal="0 0 1"
+                    data-label="63 mm cup-holder base"
+                    data-note="A non-slip pad on a 62.9 mm footprint — it drops into a standard car cup holder.">
+              <span class="hotspot__dot" aria-hidden="true"></span>
+              <span class="hotspot__label">Base</span>
+            </button>
+          </model-viewer>
+          <p class="stage__loading">Loading the 3D model…</p>
+        </div>
+
+        <div class="callout" id="hotspot-panel" aria-live="polite">
+          <p class="callout__hint">Tap a marker on the model to read about that part.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 4. Benefits breakdown ==================== -->
+  <section class="section">
+    <div class="container">
+      <div class="section__head">
+        <h2>Where it earns its place</h2>
+      </div>
+
+      <div class="benefit">
+        <img src="assets/img/desk-lede.svg" alt="Placeholder image: the tumbler on a desk beside a keyboard" loading="lazy" width="800" height="600">
+        <div>
+          <h3>Nine hours at a desk</h3>
+          <p>The narrow 63 mm body leaves room for a mouse. The base pad means you can put it
+            down mid-call without announcing it to the room, and the straw means you drink more
+            than you would from a lid you have to unscrew.</p>
+        </div>
+      </div>
+
+      <div class="benefit benefit--flip">
+        <img src="assets/img/car-cup.svg" alt="Placeholder image: the tumbler seated in a car cup holder" loading="lazy" width="800" height="600">
+        <div>
+          <h3>Then the commute</h3>
+          <p>Straight sides, no taper, no rubber ring to lose — it seats in a standard holder and
+            stays there. The lid threads down, so the school run doesn't end with a wet gearstick.</p>
+        </div>
+      </div>
+
+      <div class="benefit">
+        <img src="assets/img/dishwasher.svg" alt="Placeholder image: lid, straw and grommet separated in a dishwasher tray" loading="lazy" width="800" height="600">
+        <div>
+          <h3>And it comes clean</h3>
+          <p>Five parts, no glued assemblies. The grommet lifts out of the lid, so the one place
+            that traps milk is the one place you can actually reach.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 5. Social proof ======================= -->
+  <section class="section section--surface" id="reviews">
+    <div class="container">
+      <div class="section__head">
+        <h2>2,300 people already carry one</h2>
+      </div>
+
+      <ul class="stats" role="list">
+        <li><strong data-countup="4.8" data-decimals="1">4.8</strong><span>average rating</span></li>
+        <li><strong data-countup="2300" data-suffix="+">2,300+</strong><span>reviews</span></li>
+        <li><strong data-countup="94" data-suffix="%">94%</strong><span>would buy again</span></li>
+        <li><strong data-countup="12" data-suffix="h">12h</strong><span>held cold, tested</span></li>
+      </ul>
+
+      <div class="quotes">
+        <blockquote><p>“Left it in the car at noon in July. Still had ice in it that evening.”</p><cite>Reem A., verified buyer</cite></blockquote>
+        <blockquote><p>“Third tumbler I've owned and the first whose lid I trust in a backpack.”</p><cite>Jassim M., verified buyer</cite></blockquote>
+        <blockquote><p>“The straw comes apart properly. That sounds small until you've cleaned the other kind.”</p><cite>Dana K., verified buyer</cite></blockquote>
+      </div>
+
+      <div class="ugc__head">
+        <h3>Customer photos</h3>
+        <span class="tag">Placeholder images</span>
+      </div>
+      <ul class="ugc" role="list">
+        <li><img src="assets/img/ugc-1.svg" alt="Placeholder customer photo 1" loading="lazy" width="800" height="600"></li>
+        <li><img src="assets/img/ugc-2.svg" alt="Placeholder customer photo 2" loading="lazy" width="800" height="600"></li>
+        <li><img src="assets/img/ugc-3.svg" alt="Placeholder customer photo 3" loading="lazy" width="800" height="600"></li>
+        <li><img src="assets/img/ugc-4.svg" alt="Placeholder customer photo 4" loading="lazy" width="800" height="600"></li>
+        <li><img src="assets/img/ugc-5.svg" alt="Placeholder customer photo 5" loading="lazy" width="800" height="600"></li>
+        <li><img src="assets/img/ugc-6.svg" alt="Placeholder customer photo 6" loading="lazy" width="800" height="600"></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================ 6. Sustainability and materials ================ -->
+  <section class="section">
+    <div class="container materials__grid">
+      <div>
+        <div class="section__head">
+          <p class="label">Materials</p>
+          <h2>One tumbler, not 400 cups</h2>
+          <p class="lede lede--sm">A 350 ml daily habit is roughly 250 disposable cups a year.
+            This is 18/8 steel with a matte powder coat, a polypropylene lid and straw, and a
+            silicone grommet — all replaceable, none of them glued together.</p>
+        </div>
+        <p class="fineprint">Dimensions and capacity are estimates taken from our reference
+          model: 350 ml measured below the lid roof, excluding drinking headspace. Not a
+          certified measurement.</p>
+      </div>
+      <table class="spec">
+        <caption class="sr-only">Specification</caption>
+        <tbody>
+          <tr><th scope="row">Capacity</th><td>350 ml (estimated, below the lid roof)</td></tr>
+          <tr><th scope="row">Diameter</th><td>62.9 mm</td></tr>
+          <tr><th scope="row">Height, lid on</th><td>170.1 mm</td></tr>
+          <tr><th scope="row">Height with straw</th><td>214.5 mm</td></tr>
+          <tr><th scope="row">Straw</th><td>204.3 mm · 7.4 mm outer · 5.9 mm inner</td></tr>
+          <tr><th scope="row">Body</th><td>18/8 stainless, double wall, vacuum</td></tr>
+          <tr><th scope="row">Finish</th><td>Matte Mykonos blue powder coat</td></tr>
+          <tr><th scope="row">Care</th><td>Top rack; five separable parts</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ==================== 7. Bundles and finishes ==================== -->
+  <section class="section section--surface" id="bundles">
+    <div class="container">
+      <div class="section__head">
+        <h2>Pick a finish and a pack</h2>
+      </div>
+
+      <fieldset class="chooser">
+        <legend class="label chooser__legend">Finish</legend>
+        <div class="swatches" role="radiogroup" aria-label="Finish">
+          <button class="swatch is-selected" role="radio" aria-checked="true" data-finish="Mykonos blue" style="--sw:#44607A">
+            <span class="swatch__chip" aria-hidden="true"></span><span>Mykonos blue</span>
+          </button>
+          <button class="swatch" role="radio" aria-checked="false" data-finish="Whitewash" style="--sw:#F6F3EE">
+            <span class="swatch__chip" aria-hidden="true"></span><span>Whitewash</span>
+          </button>
+          <button class="swatch" role="radio" aria-checked="false" data-finish="Sun-bleached stone" style="--sw:#DAD2C0">
+            <span class="swatch__chip" aria-hidden="true"></span><span>Sun-bleached stone</span>
+          </button>
+          <button class="swatch" role="radio" aria-checked="false" data-finish="Aegean night" style="--sw:#1C2B38">
+            <span class="swatch__chip" aria-hidden="true"></span><span>Aegean night</span>
+          </button>
+        </div>
+        <!-- TODO: per-finish textures for the GLB; the swatches are visual only. -->
+        <p class="fineprint">The 3D model shows Mykonos blue.</p>
+      </fieldset>
+
+      <fieldset class="chooser">
+        <legend class="label chooser__legend">Pack</legend>
+        <div class="packs" role="radiogroup" aria-label="Pack size">
+          <button class="pack is-selected" role="radio" aria-checked="true" data-price="34" data-qty="1">
+            <span class="pack__name">Single</span>
+            <span class="pack__price">$34</span>
+            <span class="pack__note">One tumbler, one spare straw</span>
+          </button>
+          <button class="pack" role="radio" aria-checked="false" data-price="62" data-qty="2">
+            <span class="tag pack__badge">Most popular</span>
+            <span class="pack__name">Two-pack</span>
+            <span class="pack__price">$62</span>
+            <span class="pack__note">$31 each, free shipping</span>
+          </button>
+          <button class="pack" role="radio" aria-checked="false" data-price="112" data-qty="4">
+            <span class="pack__name">Four-pack</span>
+            <span class="pack__price">$112</span>
+            <span class="pack__note">$28 each, free shipping</span>
+          </button>
+        </div>
+      </fieldset>
+
+      <div class="cluster">
+        <button class="btn btn--primary btn--lg" data-add-to-cart>Add to cart,<span data-price-label>$34</span></button>
+        <span class="give give--inline">
+          <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"></use></svg>
+          Free shipping over $45, spare straw on your first order.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================ 8. Guarantee and shipping ================ -->
+  <section class="section">
+    <div class="container guarantee">
+      <div class="card">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-return"></use></svg>
+        <h3>30 days to change your mind</h3>
+        <p>Use it, wash it, take it to work. If it isn't for you, send it back within 30 days
+          and we refund the tumbler.</p>
+      </div>
+      <div class="card">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"></use></svg>
+        <h3>Two-year seal warranty</h3>
+        <p>If the lid or grommet stops sealing in normal use inside two years, we replace the
+          part rather than the whole tumbler.</p>
+      </div>
+      <div class="card">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-truck"></use></svg>
+        <h3>Shipping</h3>
+        <p>Dispatch Monday to Friday from Kuwait City. GCC in two to four working days,
+          international in five to nine. Free over $45.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== 9. FAQ ========================== -->
+  <section class="section section--surface" id="faq">
+    <div class="container container--narrow">
+      <div class="section__head">
+        <h2>Questions people actually ask</h2>
+      </div>
+      <div class="faq" id="faq-list">
+
+        <div class="faq__item">
+          <h3><button class="faq__q" aria-expanded="false" id="q1" aria-controls="a1">
+            Does it really hold 350 ml? <span class="faq__mark" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="a1" role="region" aria-labelledby="q1" hidden>
+            <p>350 ml is measured below the lid roof on our reference model, excluding drinking
+              headspace and the small thread recesses. Filled to a normal level with ice, expect
+              a little under that. It's an estimate, not a certified measurement.</p>
+          </div>
+        </div>
+
+        <div class="faq__item">
+          <h3><button class="faq__q" aria-expanded="false" id="q2" aria-controls="a2">
+            Will it fit my car's cup holder? <span class="faq__mark" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="a2" role="region" aria-labelledby="q2" hidden>
+            <p>The base is 62.9 mm across and the body doesn't taper, so it fits the common
+              74 mm holder without a ring. Total height with the straw in is 214.5 mm — check
+              your console lid clears that if it closes over the holder.</p>
+          </div>
+        </div>
+
+        <div class="faq__item">
+          <h3><button class="faq__q" aria-expanded="false" id="q3" aria-controls="a3">
+            Is it leak-proof if I put it in a bag? <span class="faq__mark" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="a3" role="region" aria-labelledby="q3" hidden>
+            <p>The lid threads on and the straw runs through a gasketed grommet, so upright and
+              on its side in a bag it holds. We call it leak-resistant rather than leak-proof:
+              it's a straw opening, not a valve, so we don't claim it survives being shaken
+              upside down.</p>
+          </div>
+        </div>
+
+        <div class="faq__item">
+          <h3><button class="faq__q" aria-expanded="false" id="q4" aria-controls="a4">
+            Dishwasher or hand wash? <span class="faq__mark" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="a4" role="region" aria-labelledby="q4" hidden>
+            <p>Top rack for the lid, straw and grommet. The body is fine on the top rack too,
+              though hand washing keeps the matte coat looking new for longer.</p>
+          </div>
+        </div>
+
+        <div class="faq__item">
+          <h3><button class="faq__q" aria-expanded="false" id="q5" aria-controls="a5">
+            Can I buy a replacement straw or lid? <span class="faq__mark" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="a5" role="region" aria-labelledby="q5" hidden>
+            <p>Yes — straw, grommet and lid are all sold separately, and the seal warranty covers
+              them for two years anyway. Nothing on this tumbler is glued in.</p>
+          </div>
+        </div>
+
+        <div class="faq__item">
+          <h3><button class="faq__q" aria-expanded="false" id="q6" aria-controls="a6">
+            When does my order ship? <span class="faq__mark" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="a6" role="region" aria-labelledby="q6" hidden>
+            <p>We dispatch Monday to Friday. Orders in before 2 pm go out the same day; after
+              2 pm Thursday they go out on Monday. We don't hold stock beyond the current run,
+              so a sold-out finish waits for the next one.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 10. Closing ======================= -->
+  <section class="closing">
+    <div class="container container--narrow closing__inner">
+      <h2 class="display-2">Take the desk one with you.</h2>
+      <p class="lede">350 ml, still cold at six, and a lid you can put in a bag. $34, free
+        shipping over $45, and 30 days to send it back.</p>
+      <button class="btn btn--primary btn--lg" data-add-to-cart>Add to cart,<span data-price-label>$34</span></button>
+      <p class="scarcity">
+        <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"></use></svg>
+        Small runs, dispatch Monday to Friday.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__row">
+    <span>Coded · 350 ml tumbler</span>
+    <span>Demo storefront. The model is an estimated reconstruction and the imagery is placeholder.</span>
+  </div>
+</footer>
+
+<!-- ==================== Sticky CTA bar ==================== -->
+<div class="cta-bar" id="cta-bar" hidden>
+  <div class="container cta-bar__row">
+    <div class="cta-bar__info">
+      <span class="cta-bar__name">350 ml tumbler <span class="cta-bar__variant" data-variant-label>Mykonos blue · Single</span></span>
+      <span class="cta-bar__meta"><span class="stars stars--sm" role="img" aria-label="Rated 4.8 out of 5">★★★★★</span> 4.8 · 2,300+ reviews</span>
+    </div>
+    <span class="cta-bar__price" data-price-label>$34</span>
+    <button class="btn btn--primary" data-add-to-cart>Add to cart</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="script.js"></script>
+</body>
+</html>
